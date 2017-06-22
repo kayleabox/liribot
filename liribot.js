@@ -20,6 +20,13 @@ var mapChoices = {
             for (i=0; i<tweets.length; i++){
                 console.log(tweets[i].user.screen_name + ": " + tweets[i].text);  // The favorites. 
                 //console.log(response);  // Raw response object. 
+                fs.appendFile("log.txt", 
+                tweets[i].user.screen_name + ": " + tweets[i].text+" \n", 
+                function(err){
+                    if(err){
+                        console.log(err);
+                    }
+                });
             }
         });
     },
@@ -43,11 +50,24 @@ var mapChoices = {
                 console.log("artists: " + response.tracks.items[0].artists[0].name);
                 console.log("album: "   + response.tracks.items[0].album.name);
                 console.log("preview: " + response.tracks.items[0].preview_url);
+
+                fs.appendFile("log.txt",
+                    "song: "    + response.tracks.items[0].name+" "+ 
+                    "artists: " + response.tracks.items[0].artists[0].name+" "+
+                    "album: "   + response.tracks.items[0].album.name+" "+
+                    "preview: " + response.tracks.items[0].preview_url+" \n",
+                    function(err){
+                        if(err){
+                            console.log(err);
+                        }
+                    } 
+                )
             })
             .catch(function(err) {
                 console.log(err);
             });
-        });
+        
+        })
 
      },
 
@@ -76,7 +96,26 @@ var mapChoices = {
                     console.log("country: "      + JSON.parse(body).Country);
                     console.log("website: "      + JSON.parse(body).Website);
 
-                }
+
+                fs.appendFile("log.txt",
+                    "title: "        + JSON.parse(body).Title+" "+
+                    "release year: " + JSON.parse(body).Year+" "+
+                    "rating: "       + JSON.parse(body).imdbRating+" "+
+                    "plot: "         + JSON.parse(body).Plot+" "+
+                    "actors: "       + JSON.parse(body).Actors+" "+
+                    "language: "     + JSON.parse(body).Language+" "+
+                    "country: "      + JSON.parse(body).Country+" "+
+                    "website: "      + JSON.parse(body).Website+" \n",
+                    function(err){
+                        if(err){
+                            console.log(err);
+                        }
+                    } 
+                )
+
+            }
+
+
             }); //request ends here
         });
      },
@@ -103,6 +142,19 @@ var mapChoices = {
                 console.log("artists: " + response.tracks.items[0].artists[0].name);
                 console.log("album: "   + response.tracks.items[0].album.name);
                 console.log("preview: " + response.tracks.items[0].preview_url);
+
+                fs.appendFile("log.txt",
+                    "song: "    + response.tracks.items[0].name+" "+ 
+                    "artists: " + response.tracks.items[0].artists[0].name+" "+
+                    "album: "   + response.tracks.items[0].album.name+" "+
+                    "preview: " + response.tracks.items[0].preview_url+" \n",
+                    function(err){
+                        if(err){
+                            console.log(err);
+                        }
+                    } 
+                )            
+        
             })
             .catch(function(err) {
                 console.log(err);
