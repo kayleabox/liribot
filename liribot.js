@@ -1,11 +1,11 @@
-var twitter = require("twitter");
-var spotify = require("node-spotify-api");
-var request = require("request");
-var inquirer = require("inquirer");
-var keys = require("./keys.js");
-var fs = require("fs");
+var twitter       = require("twitter");
+var spotify       = require("node-spotify-api");
+var request       = require("request");
+var inquirer      = require("inquirer");
+var keys          = require("./keys.js");
+var fs            = require("fs");
 var twitterClient = new twitter(keys.twitterKeys);
-/*var spotifyClient = new spotify ({
+/*var spotifyClient = new spotify ({ //moved this to the getSong() so token would not expire
     id: "8912ac2e0cd948238b8f2f49d64c3d32", 
     secret: "83d9301f7d01463a8e7fafe73c68cebd"
 });*/
@@ -15,17 +15,15 @@ var mapChoices = {
 	"Get Tweets": function(){ 
         //get last 20 tweets
         console.log("tweeting!");
-        twitterClient.get('statuses/user_timeline',{count: '20'}, function(error, tweets, response) {
+        twitterClient.get('statuses/user_timeline',{count: '20'}, 
+        function(error, tweets, response) {
             if(error) throw error;
             for (i=0; i<tweets.length; i++){
                 console.log(tweets[i].user.screen_name + ": " + tweets[i].text);  // The favorites. 
-                //console.log(response);  // Raw response object. 
                 fs.appendFile("log.txt", 
                 tweets[i].user.screen_name + ": " + tweets[i].text+" \n", 
                 function(err){
-                    if(err){
-                        console.log(err);
-                    }
+                    if(err){console.log(err);}
                 });
             }
             runAgain();
@@ -38,11 +36,13 @@ var mapChoices = {
         console.log("spotifying")
         //This will show the following information in the terminal
         //artist(s), song's name, preview link of the song from Spotify, album
-        inquirer.prompt([
-            {type:"input", name:"song", message:"what song should we look up?", default: "i want it that way"}
-        ]).then(function(user){
-            //use spotify to get the info! 
-            
+        inquirer.prompt([{
+            type:    "input", 
+            name:    "song", 
+            message: "what song should we look up?", 
+            default: "i want it that way"
+        }]).then(function(user){
+            //use spotify to get the info!  
             getSong(user.song);
         })
 
@@ -54,9 +54,13 @@ var mapChoices = {
     "Movie This": function(){
         //title, year, IMDB Rating, country produced in, language, plot sum., 
         //actor, rotten tomatoes url
-        inquirer.prompt([
-            {type:"input", name:"movie", message:"what movie should we look up?", default: "Mr. Nobody"}
-        ]).then(function(user){
+        console.log("movie-ing");
+        inquirer.prompt([{
+            type:    "input", 
+            name:    "movie", 
+            message: "what movie should we look up?", 
+            default: "Mr. Nobody"
+        }]).then(function(user){
             //use OMBD to get the info!
             var queryUrl = "http://www.omdbapi.com/?apikey=40e9cece&t=" + user.movie + "&y=&plot=short&r=json";
             
@@ -84,9 +88,7 @@ var mapChoices = {
                     "country: "      + JSON.parse(body).Country+" "+
                     "website: "      + JSON.parse(body).Website+" \n",
                     function(err){
-                        if(err){
-                            console.log(err);
-                        }
+                        if(err){console.log(err);}
                     } 
                 )
                 runAgain();
@@ -103,6 +105,7 @@ var mapChoices = {
 	
     "Random": function(){
         //run a random command on random.txt (should be spotify this)
+        console.log("randoming");
         var action, song; 
         fs.readFile("random.txt", "utf-8", function(err, data){
             if(err){
