@@ -5,10 +5,10 @@ var inquirer = require("inquirer");
 var keys = require("./keys.js");
 var fs = require("fs");
 var twitterClient = new twitter(keys.twitterKeys);
-var spotifyClient = new spotify ({
+/*var spotifyClient = new spotify ({
     id: "8912ac2e0cd948238b8f2f49d64c3d32", 
     secret: "83d9301f7d01463a8e7fafe73c68cebd"
-});
+});*/
 
 var mapChoices = {
     //************************************************************************
@@ -28,6 +28,7 @@ var mapChoices = {
                     }
                 });
             }
+            runAgain();
         });
     },
     //************************************************************************
@@ -42,31 +43,7 @@ var mapChoices = {
         ]).then(function(user){
             //use spotify to get the info! 
             
-            spotifyClient.search({ type: 'track', query: user.song, limit: "1" })
-            .then(function(response) {
-                //console.log(JSON.stringify(response.tracks.items[0]))//used this to figure out how to get the artists
-                //console.log(response.tracks.items);
-                console.log("song: "    + response.tracks.items[0].name); 
-                console.log("artists: " + response.tracks.items[0].artists[0].name);
-                console.log("album: "   + response.tracks.items[0].album.name);
-                console.log("preview: " + response.tracks.items[0].preview_url);
-
-                fs.appendFile("log.txt",
-                    "song: "    + response.tracks.items[0].name+" "+ 
-                    "artists: " + response.tracks.items[0].artists[0].name+" "+
-                    "album: "   + response.tracks.items[0].album.name+" "+
-                    "preview: " + response.tracks.items[0].preview_url+" \n",
-                    function(err){
-                        if(err){
-                            console.log(err);
-                        }
-                    } 
-                )
-            })
-            .catch(function(err) {
-                console.log(err);
-            });
-        
+            getSong(user.song);
         })
 
      },
@@ -112,6 +89,7 @@ var mapChoices = {
                         }
                     } 
                 )
+                runAgain();
 
             }
 
@@ -134,7 +112,47 @@ var mapChoices = {
             var dataArr = data.split(",");
             action = dataArr[0], song = dataArr[1]
 
-            spotifyClient.search({ type: 'track', query: dataArr[1], limit: "1" })
+            getSong(dataArr[1]);
+            //mapChoices[dataArr[0]]()//have to change the spotify this function 
+        })
+
+     },
+	
+}
+
+function runProgram(){
+    inquirer.prompt([
+        {type: "list",
+        name: "action",
+        message: "what would you like to do?",
+        choices:["Get Tweets", "Spotify This", "Movie This", "Random"]
+        }
+    ]).then(function(user){
+        console.log(user.action);
+        var action = user.action;
+        mapChoices[action](); // make sure to add () after [action] to call the function
+    })
+}
+
+function runAgain(){
+    inquirer.prompt([{
+        type:"confirm",
+        name:"run",
+        message:"would you like to run the program again?"
+    }]).then(function(user){
+        if(user.run){
+            runProgram();
+        }
+    })
+}
+
+function getSong(song){
+    var spotifyClient = new spotify ({
+        id: "8912ac2e0cd948238b8f2f49d64c3d32", 
+        secret: "83d9301f7d01463a8e7fafe73c68cebd"
+    });
+
+    spotifyClient.search({ type: 'track', query: song, limit: "1" })
             .then(function(response) {
                 //console.log(JSON.stringify(response.tracks.items[0]))//used this to figure out how to get the artists
                 //console.log(response.tracks.items);
@@ -153,30 +171,14 @@ var mapChoices = {
                             console.log(err);
                         }
                     } 
-                )            
+                )     
+                runAgain();       
         
             })
             .catch(function(err) {
                 console.log(err);
             });
 
-            //mapChoices[dataArr[0]]()//have to change the spotify this function 
-        })
-
-     },
-	
 }
 
-inquirer.prompt([
-    {type: "list",
-    name: "action",
-    message: "what would you like to do?",
-    choices:["Get Tweets", "Spotify This", "Movie This", "Random"]
-    }
-]).then(function(user){
-    console.log(user.action);
-    var action = user.action;
-    mapChoices[action](); // make sure to add () after [action] to call the function
-})
-
-
+runProgram();
